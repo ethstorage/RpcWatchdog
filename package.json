@@ -1,0 +1,14 @@
+{
+  "name": "RpcWatchdog",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ethstorage/RpcWatchdog.git",
+  "author": "iteye <iteyelmp@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@alicloud/pop-core": "^1.8.0",
+    "@sendgrid/mail": "^8.1.4",
+    "dotenv": "^16.4.5",
+    "ethstorage-sdk": "/Users/lmp/IdeaProjects/ethstorage-sdk"
+  }
+}
