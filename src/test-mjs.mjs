@@ -1,15 +1,32 @@
-import { FlatDirectory, UploadType } from 'ethstorage-sdk';
-import { NodeFile } from 'ethstorage-sdk/file';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import './test-utils.js';
-
-import dotenv from 'dotenv';
-dotenv.config({ path: '../.env' });
-
 import sendgrid from '@sendgrid/mail';
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+import dotenv from 'dotenv';
+dotenv.config({ path: '../.env' });
+// File path for testing
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const privateKey = process.env.PRIVATE_KEY;
+
+let FlatDirectory, UploadType, NodeFile;
+try {
+    console.log("🔄 Loading SDK modules...");
+    const sdk = await import('ethstorage-sdk');
+    FlatDirectory = sdk.FlatDirectory;
+    UploadType = sdk.UploadType;
+
+    const fileModule = await import('ethstorage-sdk/file');
+    NodeFile = fileModule.NodeFile;
+    console.log("✅ SDK modules loaded successfully!");
+} catch (err) {
+    console.error("❌ SDK error:", err);
+    await sendNotification("MJS RPC Test Failure", `Error is:\n ${err.message}`);
+    process.exit(1);
+}
 
 // Send email notification
 async function sendNotification(subject, message) {
@@ -21,12 +38,6 @@ async function sendNotification(subject, message) {
     };
     await sendgrid.send(msg);
 }
-
-// File path for testing
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const privateKey = process.env.PRIVATE_KEY;
 
 async function fileResolver(filename) {
     return new NodeFile(path.join(__dirname, `../assets/${filename}`));

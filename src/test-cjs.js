@@ -97,14 +97,14 @@ async function fileResolver(filename) {
 
 async function runTests() {
     try {
-        // console.log("Running EthStorage test...");
-        // await EthStorageTest();
-        //
-        // console.log()
-        // console.log()
-        // console.log()
-        // console.log("Running FlatDirectory test...");
-        // await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
+        console.log("Running EthStorage test...");
+        await EthStorageTest();
+
+        console.log()
+        console.log()
+        console.log()
+        console.log("Running FlatDirectory test...");
+        await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
 
         console.log()
         console.log()
