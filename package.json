@@ -13,6 +13,6 @@
     "@sendgrid/mail": "^8.1.4",
     "dotenv": "^16.4.5",
     "ethstorage-sdk": "^3.0.4",
-    "puppeteer": "^24.4.0"
+    "jsdom": "^26.0.0"
   }
 }
