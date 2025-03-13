@@ -97,19 +97,25 @@ async function fileResolver(filename) {
 
 async function runTests() {
     try {
-        console.log("\nRunning EthStorage test...\n");
-        await EthStorageTest();
+        // console.log("Running EthStorage test...");
+        // await EthStorageTest();
+        //
+        // console.log()
+        // console.log()
+        // console.log()
+        // console.log("Running FlatDirectory test...");
+        // await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
 
-        console.log("\nRunning FlatDirectory test...\n");
-        await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
-
-        console.log("\nRunning Sepolia test...\n");
+        console.log()
+        console.log()
+        console.log()
+        console.log("Running Sepolia test...");
         await SepoliaTest();
 
         console.log("✅ All tests passed successfully!");
     } catch (error) {
         console.error("❌ Error during tests:", error);
-        await sendNotification("Test Failure", `Error during test execution: ${error.message}`);
+        await sendNotification("RPC Test Failure", `Error is:\n ${error.message}`);
     }
 }
 

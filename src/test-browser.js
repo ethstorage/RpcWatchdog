@@ -1,11 +1,13 @@
-import { JSDOM } from 'jsdom';
-import { FlatDirectory, UploadType } from 'ethstorage-sdk';
-import { flatDirectoryTest } from './test-utils.js';
-import sendgrid from "@sendgrid/mail";
-import dotenv from 'dotenv';
+const { JSDOM } = require('jsdom');
+const { FlatDirectory, UploadType } = require('ethstorage-sdk');
+const { flatDirectoryTest } = require("./test-utils");
 
+const dotenv = require("dotenv")
 dotenv.config({ path: '../.env' });
 const privateKey = process.env.PRIVATE_KEY;
+
+const sendgrid = require('@sendgrid/mail');
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Send email notification
 async function sendNotification(subject, message) {
@@ -23,6 +25,10 @@ async function fileResolver() {
 }
 
 (async () => {
+    console.log()
+    console.log()
+    console.log()
+
     try {
         const dom = new JSDOM(`<!DOCTYPE html><html><body><button id="runTest">Run Test</button></body></html>`);
         global.document = dom.window.document;
@@ -31,11 +37,12 @@ async function fileResolver() {
 
         document.getElementById("runTest").addEventListener("click", async () => {
             try {
-                console.log("🚀 Running SDK test in jsdom...");
+                console.log("🚀 Running Browser test...");
                 await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
-                console.log("✅ SDK 测试通过！");
+                console.log("✅ All tests passed successfully!");
             } catch (err) {
-                console.error("❌ SDK 测试失败:", err);
+                console.error("❌ Error during tests:", err);
+                await sendNotification("Browser RPC Test Failure", `Error is:\n ${err.message}`);
             }
         });
 
@@ -43,6 +50,5 @@ async function fileResolver() {
         button.click();
     } catch (err) {
         console.error("❌ Error in jsdom test:", err);
-        await sendNotification("Browser Test Failure", `Error during test execution: ${err.message}`);
     }
 })();

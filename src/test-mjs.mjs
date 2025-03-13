@@ -34,12 +34,15 @@ async function fileResolver(filename) {
 
 async function runTests() {
     try {
-        console.log("\nRunning FlatDirectory test...\n");
+        console.log()
+        console.log()
+        console.log()
+        console.log("Running mjs FlatDirectory test...");
         await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
         console.log("✅ All tests passed successfully!");
     } catch (error) {
         console.error("❌ Error during tests:", error);
-        await sendNotification("Test Failure", `Error during test execution: ${error.message}`);
+        await sendNotification("MJS RPC Test Failure", `Error is:\n ${error.message}`);
     }
 }
 
