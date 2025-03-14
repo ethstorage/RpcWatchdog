@@ -9,8 +9,16 @@ const privateKey = process.env.PRIVATE_KEY;
 const sendgrid = require('@sendgrid/mail');
 sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
-// Send email notification
+function logInfo(message) {
+    console.log(`ℹ️ [INFO] ${message}`);
+}
+
+function logError(message) {
+    console.error(`❌ [ERROR] ${message}`);
+}
+
 async function sendNotification(subject, message) {
+    logInfo("Sending email notification...");
     const msg = {
         to: process.env.QKC_EMAILLIST.split(','),
         from: 'QuarkChainMining@quarkchain.org',
@@ -18,26 +26,25 @@ async function sendNotification(subject, message) {
         text: message
     };
     await sendgrid.send(msg);
+    logInfo("Email notification sent.");
 }
 
 (async () => {
     let browser;
     try {
-        // 1. 打包 testUtils.js 和相关依赖（esbuild）
-        console.log('正在打包测试脚本...');
+        logInfo("Packing test script...");
         await esbuild.build({
             entryPoints: [path.resolve(__dirname, 'utils/browser-bundle.mjs')],
             bundle: true,
             format: 'esm',
             outfile: path.resolve(__dirname, 'dist/browser-bundle.mjs'),
         });
-        console.log('打包完成，开始测试...');
+        logInfo("Packing completed, starting tests...");
 
-        // 2. 启动 Puppeteer
         browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
         await page.goto('about:blank');
-        page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+        page.on('console', msg => logInfo(`BROWSER LOG: ${msg.text()}`));
 
         await page.addScriptTag({ path: path.resolve(__dirname, 'dist/browser-bundle.mjs') });
         const result = await page.evaluate(async (privateKey) => {
@@ -55,7 +62,7 @@ async function sendNotification(subject, message) {
             throw new Error(result.error);
         }
     } catch (err) {
-        console.error("❌ Error during tests:", err.message);
+        logError(`Error during tests: ${err.message}`);
         await sendNotification("Browser Test Failure", `Error is:\n ${err.message}`);
     } finally {
         if (browser) await browser.close();
