@@ -32,7 +32,7 @@ async function sendNotification(subject, message) {
 (async () => {
     let browser;
     try {
-        logInfo("Packing test script...");
+        logInfo("\n\n\nPacking test script...");
         await esbuild.build({
             entryPoints: [path.resolve(__dirname, 'utils/browser-bundle.mjs')],
             bundle: true,

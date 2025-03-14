@@ -55,7 +55,7 @@ async function fileResolver(filename) {
 
 async function runTests() {
     try {
-        logInfo("\nn\n\nRunning MJS FlatDirectory test...");
+        logInfo("\n\n\nRunning MJS FlatDirectory test...");
         await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
         logInfo("✅ All tests passed successfully!");
     } catch (error) {
