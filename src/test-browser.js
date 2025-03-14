@@ -1,8 +1,8 @@
-const { JSDOM } = require('jsdom');
-const { FlatDirectory, UploadType } = require('ethstorage-sdk');
-const { flatDirectoryTest } = require("./test-utils");
+const puppeteer = require('puppeteer');
+const esbuild = require('esbuild');
+const path = require('path');
 
-const dotenv = require("dotenv")
+const dotenv = require("dotenv");
 dotenv.config({ path: '../.env' });
 const privateKey = process.env.PRIVATE_KEY;
 
@@ -20,35 +20,44 @@ async function sendNotification(subject, message) {
     await sendgrid.send(msg);
 }
 
-async function fileResolver() {
-    return undefined;
-}
-
 (async () => {
-    console.log()
-    console.log()
-    console.log()
-
+    let browser;
     try {
-        const dom = new JSDOM(`<!DOCTYPE html><html><body><button id="runTest">Run Test</button></body></html>`);
-        global.document = dom.window.document;
-        global.window = dom.window;
-        global.navigator = dom.window.navigator;
-
-        document.getElementById("runTest").addEventListener("click", async () => {
-            try {
-                console.log("🚀 Running Browser test...");
-                await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
-                console.log("✅ All tests passed successfully!");
-            } catch (err) {
-                console.error("❌ Error during tests:", err);
-                await sendNotification("Browser RPC Test Failure", `Error is:\n ${err.message}`);
-            }
+        // 1. 打包 testUtils.js 和相关依赖（esbuild）
+        console.log('正在打包测试脚本...');
+        await esbuild.build({
+            entryPoints: [path.resolve(__dirname, 'utils/browser-bundle.mjs')],
+            bundle: true,
+            format: 'esm',
+            outfile: path.resolve(__dirname, 'dist/browser-bundle.mjs'),
         });
+        console.log('打包完成，开始测试...');
 
-        const button = document.getElementById("runTest");
-        button.click();
+        // 2. 启动 Puppeteer
+        browser = await puppeteer.launch({ headless: true });
+        const page = await browser.newPage();
+        await page.goto('about:blank');
+        page.on('console', msg => console.log('BROWSER LOG:', msg.text()));
+
+        await page.addScriptTag({ path: path.resolve(__dirname, 'dist/browser-bundle.mjs') });
+        const result = await page.evaluate(async (privateKey) => {
+            try {
+                if (typeof window.test !== 'function') {
+                    throw new Error('test is not available on window.');
+                }
+                return await window.test(privateKey);
+            } catch (err) {
+                return { error: err.message };
+            }
+        }, privateKey);
+
+        if (result && result.error) {
+            throw new Error(result.error);
+        }
     } catch (err) {
-        console.error("❌ Error in jsdom test:", err);
+        console.error("❌ Error during tests:", err.message);
+        await sendNotification("Browser Test Failure", `Error is:\n ${err.message}`);
+    } finally {
+        if (browser) await browser.close();
     }
 })();

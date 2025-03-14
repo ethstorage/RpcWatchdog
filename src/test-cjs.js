@@ -3,7 +3,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { EthStorage, FlatDirectory, UploadType } = require('ethstorage-sdk');
 const { NodeFile } = require("ethstorage-sdk/file");
-const { flatDirectoryTest } = require("./test-utils");
+const { flatDirectoryTest } = require("./utils/utils");
 
 const dotenv = require("dotenv")
 dotenv.config({ path: '../.env' });

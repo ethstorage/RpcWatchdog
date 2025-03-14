@@ -12,7 +12,10 @@
     "@alicloud/pop-core": "^1.8.0",
     "@sendgrid/mail": "^8.1.4",
     "dotenv": "^16.4.5",
-    "ethstorage-sdk": "^3.0.4",
-    "jsdom": "^26.0.0"
+    "esbuild": "^0.25.1",
+    "ethstorage-sdk": "^3.0.5",
+    "jsdom": "^26.0.0",
+    "puppeteer": "^24.4.0",
+    "vm2": "^3.9.19"
   }
 }

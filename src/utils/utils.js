@@ -23,7 +23,7 @@ async function flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileReso
     let request = {
         type: UploadType.Calldata,
         key: "data.txt",
-        content: Buffer.from("1234567890"),
+        content: new TextEncoder().encode("1234567890"),
         gasIncPct: 1,
         callback: uploadCallback
     };
@@ -50,7 +50,7 @@ async function flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileReso
     request = {
         type: UploadType.Blob,
         key: "blobData.txt",
-        content: Buffer.from("12345678"),
+        content: new TextEncoder().encode("12345678"),
         gasIncPct: 5,
         callback: uploadCallback
     };
@@ -73,12 +73,11 @@ async function flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileReso
     }
 
 
-
     // Download test
     await fd.download("data.txt", {
         onProgress: (progress, count, data) => {
-            console.log(progress, count, Buffer.from(data).toString());
-            if (!Buffer.from(data).equals(Buffer.from("1234567890"))) {
+            console.log(progress, count);
+            if (new TextDecoder().decode(data) !== "1234567890") {
                 throw new Error("Downloaded data does not match the original data.");
             }
         },
