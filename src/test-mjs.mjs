@@ -5,13 +5,14 @@ import './utils/utils.js';
 
 import dotenv from 'dotenv';
 dotenv.config({ path: '../.env' });
-sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+const privateKey = process.env.PRIVATE_KEY;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 import sendgrid from '@sendgrid/mail';
-const privateKey = process.env.PRIVATE_KEY;
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
+
 
 function logInfo(message) {
     console.log(`ℹ️ [INFO] ${message}`);
