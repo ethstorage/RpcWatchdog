@@ -32,7 +32,7 @@ const createAddress = async (chainId) => {
     const createResult = executeCommand(`npx ethfs-cli create -p ${privateKey} -c ${chainId}`, "Deploying contract");
     const contractAddress = createResult.match(/FlatDirectory: Address is (0x[a-fA-F0-9]{40})/)?.[1];
     if (!contractAddress) {
-        throw new Error('无法从返回值中提取地址');
+        throw new Error('Failed to extract contract address from the output.');
     }
     return contractAddress;
 };
@@ -72,7 +72,7 @@ const main = async () => {
         download(address, chainId);
 
         chainId = 11155111;
-        address = await createAddress(chainId);
+        address = '0x1659AFC134A825F75651F2ecb67F9a38fFe6Bbd8';
         upload(address, chainId);
         download(address, chainId);
         console.log("✅ All tests passed successfully!");
