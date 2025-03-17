@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const crypto = require('crypto');
 const { EthStorage, FlatDirectory, UploadType } = require('ethstorage-sdk');
 const { NodeFile } = require("ethstorage-sdk/file");
 const { flatDirectoryTest } = require("./utils/utils");
@@ -36,51 +35,28 @@ const smallFile = path.join(__dirname, '../assets/small.jpeg');
 const name = smallFile.substring(smallFile.lastIndexOf("/") + 1);
 
 async function SepoliaTest() {
-    const fd = await FlatDirectory.create({
+    const es = await EthStorage.create({
         rpc: 'http://88.99.30.186:8545/',
         ethStorageRpc: 'http://65.108.236.27:9540',
-        privateKey,
-        address: "0xB07eE802AcAc76431eAEA9b746DB0FaDE84b01cC"
+        privateKey
     });
-    // await fd.deploy();
 
-    const uploadCallback = {
-        onProgress: (progress, count, isChange) => {
-            console.log(`progress:${progress}, count:${count}, isChange:${isChange}`);
-        },
-        onFail: (err) => {
-            throw new Error(`Upload failed: ${err.message}`);
-        },
-        onFinish: (totalUploadChunks, totalUploadSize, totalStorageCost) => {
-            console.log(`totalUploadChunks:${totalUploadChunks}, totalUploadSize:${totalUploadSize}, totalStorageCost:${totalStorageCost}`);
-        }
-    };
-
-    const content = crypto.randomBytes(64);
-    const request = {
-        type: 2,
-        key: "blobData.txt",
-        content: content,
-        callback: uploadCallback
+    const content = fs.readFileSync(smallFile);
+    const cost = await es.estimateCost(name, content);
+    console.log(`Cost: `, cost);
+    let result = await es.write(name, content);
+    if (!result.success) {
+        throw new Error("Failed to write blob.");
     }
-    await fd.upload(request);
 
     await new Promise(resolve => setTimeout(resolve, 20000));
 
-    await fd.download("blobData.txt", {
-        onProgress: (progress, count, data) => {
-            console.log(progress, count);
-            if (new TextDecoder().decode(data) !== new TextDecoder().decode(content)) {
-                throw new Error("Downloaded data does not match the original data.");
-            }
-        },
-        onFail: (err) => {
-            throw new Error(`Download failed: ${err.message}`);
-        },
-        onFinish: () => {
-            console.log('Download finish');
-        }
-    });
+    let buff = await es.read(name);
+    if (Buffer.from(content).equals(Buffer.from(buff))) {
+        logInfo("Read data matches written data ✅");
+    } else {
+        throw new Error("Read data does not match written data ❌");
+    }
 }
 
 async function EthStorageTest() {

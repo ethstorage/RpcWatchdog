@@ -72,8 +72,9 @@ const main = async () => {
         download(address, chainId);
 
         chainId = 11155111;
-        address = '0x1659AFC134A825F75651F2ecb67F9a38fFe6Bbd8';
+        address = await createAddress(chainId);
         upload(address, chainId);
+        await new Promise(resolve => setTimeout(resolve, 20000));
         download(address, chainId);
         console.log("✅ All tests passed successfully!");
     } catch (error) {
