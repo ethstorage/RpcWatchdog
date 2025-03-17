@@ -16,7 +16,7 @@ node src/test-browser.js || exit 1
 echo ""
 echo ""
 echo "Updating ethfs-cli to latest version..."
-npm install -g ethfs-cli@latest
+sudo npm install -g ethfs-cli@latest
 hash -r
 
 node src/test-cli.js || exit 1
