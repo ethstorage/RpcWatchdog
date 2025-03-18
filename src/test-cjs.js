@@ -19,18 +19,6 @@ function logError(message) {
     console.error(`❌ [ERROR] ${message}`);
 }
 
-async function sendNotification(subject, message) {
-    logInfo("Sending email notification...");
-    const msg = {
-        to: process.env.QKC_EMAILLIST.split(','),
-        from: 'QuarkChainMining@quarkchain.org',
-        subject: subject,
-        text: message
-    };
-    await sendgrid.send(msg);
-    logInfo("Email notification sent.");
-}
-
 const smallFile = path.join(__dirname, '../assets/small.jpeg');
 const name = smallFile.substring(smallFile.lastIndexOf("/") + 1);
 
@@ -99,21 +87,16 @@ async function fileResolver(filename) {
 }
 
 async function runTests() {
-    try {
-        logInfo("Running EthStorage test...");
-        await EthStorageTest();
+    logInfo("Running EthStorage test...");
+    await EthStorageTest();
 
-        logInfo("\n\n\nRunning FlatDirectory test...");
-        await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
+    logInfo("\n\n\nRunning FlatDirectory test...");
+    await flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileResolver);
 
-        logInfo("\n\n\nRunning Sepolia test...");
-        await SepoliaTest();
+    logInfo("\n\n\nRunning Sepolia test...");
+    await SepoliaTest();
 
-        logInfo("✅ All tests passed successfully!");
-    } catch (error) {
-        logError(`Error during tests: ${error.message}`);
-        await sendNotification("RPC Test Failure", `Error is:\n ${error.message}`);
-    }
+    logInfo("✅ All tests passed successfully!");
 }
 
 runTests();

@@ -1,0 +1,57 @@
+name: Weekly Test Script
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 1'  # 每周一 00:00 UTC 运行 (北京时间 08:00)
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Load environment variables
+        run: printf "%s" "${{ secrets.ENV_VARS }}" > .env
+
+      - name: Install Puppeteer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 \
+          libxkbcommon-x11-0 libxcomposite1 libxrandr2 libgbm1 \
+          libpangocairo-1.0-0 libpango-1.0-0 libasound2
+
+      - name: Run test script
+        run: bash run-tests.sh
+        env:
+          GOOGLE_APP_PASSWORD: ${{ secrets.GOOGLE_APP_PASSWORD }}
+          GOOGLE_EMAIL: ${{ secrets.GOOGLE_EMAIL }}
+
+  send_email:
+    needs: run-script
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Email on Failure
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          username: ${{ secrets.GOOGLE_EMAIL }}
+          password: ${{ secrets.GOOGLE_APP_PASSWORD }}
+          subject: "❌ EthStorage GitHub Action Test Failed"
+          body: |
+            EthStorage test script failed. Please check logs:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          to: ${{ secrets.NOTIFY_EMAILS }}
+          from: "GitHub Actions <${{ secrets.GOOGLE_EMAIL }}>"
