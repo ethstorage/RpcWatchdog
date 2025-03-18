@@ -61,6 +61,9 @@ async function EthStorageTest() {
     if (!result.success) {
         throw new Error("Failed to write blob.");
     }
+
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
     let buff = await es.read(name);
     if (Buffer.from(content).equals(Buffer.from(buff))) {
         logInfo("Read data matches written data ✅");
@@ -74,6 +77,9 @@ async function EthStorageTest() {
     if (!result.success) {
         throw new Error("Failed to write blobs.");
     }
+
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
     buff = await es.read('key2');
     if (Buffer.from(blobData[1]).equals(Buffer.from(buff))) {
         logInfo("Data for keys matches ✅");

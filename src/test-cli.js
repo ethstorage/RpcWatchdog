@@ -55,6 +55,7 @@ const main = async () => {
     let address = await createAddress(chainId);
     upload(address, chainId);
     setDfault(address, chainId);
+    await new Promise(resolve => setTimeout(resolve, 10000));
     download(address, chainId);
 
     chainId = 11155111;

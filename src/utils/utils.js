@@ -73,6 +73,8 @@ async function flatDirectoryTest(FlatDirectory, UploadType, privateKey, fileReso
     }
 
 
+    await new Promise(resolve => setTimeout(resolve, 10000));
+
     // Download test
     await fd.download("data.txt", {
         onProgress: (progress, count, data) => {
